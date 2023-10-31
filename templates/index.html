@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melbourne House Price Prediction</title>
+</head>
+<body>
+    <h2>Melbourne House Price Prediction</h2>
+    <form id="predictForm">
+        <label for="rooms">Number of Rooms:</label>
+        <select id="rooms">
+            <!-- You can adjust these options based on your data -->
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <!-- ... -->
+        </select><br><br>
+
+        <label for="type">Property Type: </label>
+        <select id="type">
+            <!-- Replace these with actual types from your data -->
+            <option value="type0">House</option>
+            <option value="type1">Townhouse</option>
+            <option value="type2">Unit</option>
+            <!-- ... -->
+        </select><br><br>
+
+        <label for="bathroom">Number of Bathrooms:</label>
+        <select id="bathroom">
+            <!-- You can adjust these options based on your data -->
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <!-- ... -->
+        </select><br><br>
+
+        <label for="garage">Number of Car Garages:</label>
+        <select id="garage">
+            <!-- You can adjust these options based on your data -->
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <!-- ... -->
+        </select><br><br>
+
+        <label for="distance">Distance from CBD:</label>
+        <select id="distance">
+            <!-- You can adjust these options based on your data -->
+            <option value="5">5 km</option>
+            <option value="10">10 km</option>
+            <option value="15">15 km</option>
+            <option value="20">20 km</option>
+            <option value="25">25 km</option>
+            <option value="30">30 km</option>
+            <option value="35">35 km</option>
+            <option value="40">40 km</option>
+            <option value="45">45 km</option>
+            <option value="50">50 km</option>
+            <option value="55">55 km</option>
+            <option value="60">60 km</option>
+            <!-- ... -->
+        </select><br><br>
+
+        <label for="region">Region:</label>
+        <select id="region">
+            <!-- Replace these with actual regions from your data -->
+            <option value="region0">Eastern Metropolitan</option>
+            <option value="region1">Eastern Victoria</option>
+            <option value="region2">Northern Metropolitan</option>
+            <option value="region3">Northern Victoria</option>
+            <option value="region4">South-Eastern Metropolitan</option>
+            <option value="region5">Southern Metropolitan</option>
+            <option value="region6">Western Metropolitan</option>
+            <option value="region7">Western Victoria</option>
+            <!-- ... -->
+        </select><br><br>
+
+        <button type="button" onclick="makePrediction()">Predict Price</button>
+    </form>
+
+    <h3>Predicted Price: <span id="predictedPrice"></span></h3>
+
+    <script>
+        function makePrediction() {
+            const formData = {
+                rooms: document.getElementById('rooms').value,
+                type: document.getElementById('type').value,
+                bathroom: document.getElementById('bathroom').value,
+                garage: document.getElementById('garage').value,
+                distance: document.getElementById('distance').value,
+                region: document.getElementById('region').value,
+            };
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('predictedPrice').textContent = data.result;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
