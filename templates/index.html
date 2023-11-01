@@ -4,13 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Melbourne House Price Prediction</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('static/Images/Black_Melbourne.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            height: 100vh;
+            color: #333;
+        }
+
+        h2, h3 {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            margin: 20px;
+        }
+
+        form#predictForm {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h2>Melbourne House Price Prediction</h2>
+    <h2 style="font-size: 48px; font-weight: bold;">Melbourne House Price Prediction</h2>
     <form id="predictForm">
         <label for="rooms">Number of Rooms:</label>
         <select id="rooms">
-            <!-- You can adjust these options based on your data -->
+            <!-- Number of rooms drop down menu-->
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -28,16 +90,17 @@
 
         <label for="type">Property Type: </label>
         <select id="type">
-            <!-- Replace these with actual types from your data -->
-            <option value="type0">House</option>
-            <option value="type1">Townhouse</option>
-            <option value="type2">Unit</option>
+            <!-- Type of property drop down menu -->
+            <option value="House">House</option>
+            <option value="Townhouse">Townhouse</option>
+            <option value="Unit">Unit</option>
             <!-- ... -->
         </select><br><br>
 
         <label for="bathroom">Number of Bathrooms:</label>
         <select id="bathroom">
-            <!-- You can adjust these options based on your data -->
+            <!-- Number of bathrooms drop down menu -->
+            <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -55,7 +118,8 @@
 
         <label for="garage">Number of Car Garages:</label>
         <select id="garage">
-            <!-- You can adjust these options based on your data -->
+            <!-- Number of car garages drop down menu -->
+            <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -73,7 +137,8 @@
 
         <label for="distance">Distance from CBD:</label>
         <select id="distance">
-            <!-- You can adjust these options based on your data -->
+            <!-- Distance from the CBD drop down menu -->
+            <option value="5">0 km</option>
             <option value="5">5 km</option>
             <option value="10">10 km</option>
             <option value="15">15 km</option>
@@ -91,31 +156,31 @@
 
         <label for="region">Region:</label>
         <select id="region">
-            <!-- Replace these with actual regions from your data -->
-            <option value="region0">Eastern Metropolitan</option>
-            <option value="region1">Eastern Victoria</option>
-            <option value="region2">Northern Metropolitan</option>
-            <option value="region3">Northern Victoria</option>
-            <option value="region4">South-Eastern Metropolitan</option>
-            <option value="region5">Southern Metropolitan</option>
-            <option value="region6">Western Metropolitan</option>
-            <option value="region7">Western Victoria</option>
+            <!-- Melbourne Region Location drop down menu -->
+            <option value="Eastern Metropolitan">Eastern Metropolitan</option>
+            <option value="Eastern Victoria">Eastern Victoria</option>
+            <option value="Northern Metropolitan">Northern Metropolitan</option>
+            <option value="Northern Victoria">Northern Victoria</option>
+            <option value="South-Eastern Metropolitan">South-Eastern Metropolitan</option>
+            <option value="Southern Metropolitan">Southern Metropolitan</option>
+            <option value="Western Metropolitan">Western Metropolitan</option>
+            <option value="Western Victoria">Western Victoria</option>
             <!-- ... -->
         </select><br><br>
 
         <button type="button" onclick="makePrediction()">Predict Price</button>
     </form>
 
-    <h3>Predicted Price: <span id="predictedPrice"></span></h3>
+    <h3 style="font-size: 48px; font-weight: bold;">Predicted Price: <span id="predictedPrice" style="font-size: 48px; font-weight: bold;"></span></h3>
 
     <script>
         function makePrediction() {
             const formData = {
                 rooms: document.getElementById('rooms').value,
                 type: document.getElementById('type').value,
+                distance: document.getElementById('distance').value,
                 bathroom: document.getElementById('bathroom').value,
                 garage: document.getElementById('garage').value,
-                distance: document.getElementById('distance').value,
                 region: document.getElementById('region').value,
             };
 
