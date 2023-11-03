@@ -3,18 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script type="text/javascript" src="static/constant.json"></script>
+
     <title>Melbourne House Price Prediction</title>
     <style>
+        #map {
+            height: 100%; /* The height is 400 pixels */
+            width: 100%; /* The width is the width of the web page */
+            position: absolute;
+            left: 0px;
+            top: 0px;
+        }
+
+        #formContainer {
+              position: relative;
+        }
+
         /* Global Styles */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-image: url('static/Images/Black_Melbourne.png');
-            background-size: cover;
-            background-repeat: no-repeat;
             height: 100vh;
             color: #333;
+            
         }
 
         h2, h3 {
@@ -27,7 +40,7 @@
 
         form#predictForm {
             max-width: 600px;
-            margin: 20px auto;
+            margin-left: 20px;
             background-color: rgba(255, 255, 255, 0.7);
             padding: 20px;
             border-radius: 10px;
@@ -68,12 +81,14 @@
     </style>
 </head>
 <body>
+    <div id="map"></div>
+
+    <div id="formContainer">
     <h2 style="font-size: 48px; font-weight: bold;">Melbourne House Price Prediction</h2>
     <form id="predictForm">
         <label for="suburb">Suburb Location:</label>
-        <select id="suburb">
+        <select id="suburb" onchange="suburbSelected(this.value, this.options[this.selectedIndex].text)">
             <!-- Number of suburb drop down menu-->
-            <select id="suburb">
             <option value="0">Abbotsford</option>
             <option value="1">Aberfeldie</option>
             <option value="2">Airport West</option>
@@ -407,7 +422,6 @@
             <option value="330">Yallambie</option>
             <option value="331">Yarra Glen</option>
             <option value="332">Yarraville</option>
-            <!-- ... -->
         </select><br><br>
 
         <label for="rooms">Number of Rooms:</label>
@@ -419,22 +433,14 @@
             <option value="4">4</option>
             <option value="5">5</option>
             <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-            <!-- ... -->
         </select><br><br>
 
         <label for="type">Property Type: </label>
         <select id="type">
             <!-- Type of property drop down menu -->
-            <option value="House">House</option>
-            <option value="Townhouse">Townhouse</option>
-            <option value="Unit">Unit</option>
-            <!-- ... -->
+            <option value="0">House</option>
+            <option value="1">Townhouse</option>
+            <option value="2">Unit</option>
         </select><br><br>
 
         <label for="bathroom">Number of Bathrooms:</label>
@@ -447,13 +453,6 @@
             <option value="4">4</option>
             <option value="5">5</option>
             <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-            <!-- ... -->
         </select><br><br>
 
         <label for="garage">Number of Car Garages:</label>
@@ -466,19 +465,12 @@
             <option value="4">4</option>
             <option value="5">5</option>
             <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-            <!-- ... -->
         </select><br><br>
 
+        <!--
         <label for="distance">Distance from CBD:</label>
         <select id="distance">
-            <!-- Distance from the CBD drop down menu -->
-            <option value="5">0 km</option>
+            <option value="0">0 km</option>
             <option value="5">5 km</option>
             <option value="10">10 km</option>
             <option value="15">15 km</option>
@@ -491,29 +483,35 @@
             <option value="50">50 km</option>
             <option value="55">55 km</option>
             <option value="60">60 km</option>
-            <!-- ... -->
         </select><br><br>
-
+        -->
         <label for="region">Region:</label>
         <select id="region">
             <!-- Melbourne Region Location drop down menu -->
-            <option value="Eastern Metropolitan">Eastern Metropolitan</option>
-            <option value="Eastern Victoria">Eastern Victoria</option>
-            <option value="Northern Metropolitan">Northern Metropolitan</option>
-            <option value="Northern Victoria">Northern Victoria</option>
-            <option value="South-Eastern Metropolitan">South-Eastern Metropolitan</option>
-            <option value="Southern Metropolitan">Southern Metropolitan</option>
-            <option value="Western Metropolitan">Western Metropolitan</option>
-            <option value="Western Victoria">Western Victoria</option>
-            <!-- ... -->
+            <option value="0">Eastern Metropolitan</option>
+            <option value="1">Eastern Victoria</option>
+            <option value="2" selected>Northern Metropolitan</option>
+            <option value="3">Northern Victoria</option>
+            <option value="4">South-Eastern Metropolitan</option>
+            <option value="5">Southern Metropolitan</option>
+            <option value="6">Western Metropolitan</option>
+            <option value="7">Western Victoria</option>
         </select><br><br>
+
+        <label id="distanceLbl">Distance from CDB: 3.2 km</label>
+        <input type="text" hidden id="distance" value="3.2"></input>
+        <br><br>
 
         <button type="button" onclick="makePrediction()">Predict Price</button>
     </form>
 
+    <!--
     <h3 style="font-size: 48px; font-weight: bold;">Predicted Price: <span id="predictedPrice" style="font-size: 48px; font-weight: bold;"></span></h3>
-
+    -->
+</div>
     <script>
+    
+
         function makePrediction() {
             const formData = {
                 suburb: document.getElementById('suburb').value, 
@@ -525,6 +523,7 @@
                 region: document.getElementById('region').value,
             };
 
+            
             fetch('/predict', {
                 method: 'POST',
                 headers: {
@@ -534,12 +533,809 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('predictedPrice').textContent = data.result;
+                //document.getElementById('predictedPrice').textContent = data.result;
+
+
+                var el = document.getElementById('suburb');
+                var suburbSelected = el.options[el.selectedIndex].innerHTML;
+                
+                var request = {
+                    query: suburbSelected,
+                    fields: ['name', 'geometry'],
+                };
+
+                var service = new google.maps.places.PlacesService(map);
+
+                service.findPlaceFromQuery(request, function(results, status) {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    for (var i = 0; i < results.length; i++) {
+                        createMarker(results[i], suburbSelected, data.result);
+                    }
+                    map.setCenter(results[0].geometry.location);
+                    
+                    }
+                });
+
+
+
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         }
+    </script>
+
+
+
+<!-- prettier-ignore -->
+<script async id="googleMapLoad"></script>
+</script>
+
+
+    <script>
+        var parsedGoogleJSON = JSON.parse(google_json);
+        var googleMapURL = "https://maps.googleapis.com/maps/api/js?key=" + parsedGoogleJSON.key + "&libraries=places&callback=initMap";
+        
+
+        document.getElementById('googleMapLoad').src = googleMapURL;
+
+var map1 = new Map();
+
+map1.set(0,2);
+map1.set(1,6);
+map1.set(2,6);
+map1.set(3,6);
+map1.set(4,5);
+map1.set(5,6);
+map1.set(6,2);
+map1.set(7,6);
+map1.set(8,6);
+map1.set(9,6);
+map1.set(10,6);
+map1.set(11,5);
+map1.set(12,6);
+map1.set(13,5);
+map1.set(14,5);
+map1.set(15,4);
+map1.set(16,4);
+map1.set(17,2);
+map1.set(18,6);
+map1.set(19,7);
+map1.set(20,5);
+map1.set(21,5);
+map1.set(22,5);
+map1.set(23,0);
+map1.set(24,0);
+map1.set(25,1);
+map1.set(26,1);
+map1.set(27,5);
+map1.set(28,0);
+map1.set(29,5);
+map1.set(30,5);
+map1.set(31,1);
+map1.set(32,5);
+map1.set(33,0);
+map1.set(34,0);
+map1.set(35,0);
+map1.set(36,4);
+map1.set(37,0);
+map1.set(38,4);
+map1.set(39,0);
+map1.set(40,6);
+map1.set(41,0);
+map1.set(42,5);
+map1.set(43,5);
+map1.set(44,2);
+map1.set(45,7);
+map1.set(46,6);
+map1.set(47,2);
+map1.set(48,2);
+map1.set(49,2);
+map1.set(50,0);
+map1.set(51,3);
+map1.set(52,2);
+map1.set(53,2);
+map1.set(54,6);
+map1.set(55,6);
+map1.set(56,5);
+map1.set(57,0);
+map1.set(58,6);
+map1.set(59,5);
+map1.set(60,2);
+map1.set(61,5);
+map1.set(62,2);
+map1.set(63,2);
+map1.set(64,5);
+map1.set(65,6);
+map1.set(66,4);
+map1.set(67,4);
+map1.set(68,5);
+map1.set(69,5);
+map1.set(70,5);
+map1.set(71,5);
+map1.set(72,5);
+map1.set(73,4);
+map1.set(74,4);
+map1.set(75,5);
+map1.set(76,1);
+map1.set(77,4);
+map1.set(78,4);
+map1.set(79,4);
+map1.set(80,2);
+map1.set(81,2);
+map1.set(82,2);
+map1.set(83,1);
+map1.set(84,2);
+map1.set(85,2);
+map1.set(86,2);
+map1.set(87,4);
+map1.set(88,4);
+map1.set(89,4);
+map1.set(90,2);
+map1.set(91,0);
+map1.set(92,0);
+map1.set(93,0);
+map1.set(94,0);
+map1.set(95,2);
+map1.set(96,4);
+map1.set(97,4);
+map1.set(98,5);
+map1.set(99,6);
+map1.set(100,6);
+map1.set(101,6);
+map1.set(102,3);
+map1.set(103,6);
+map1.set(104,4);
+map1.set(105,5);
+map1.set(106,0);
+map1.set(107,0);
+map1.set(108,0);
+map1.set(109,3);
+map1.set(110,4);
+map1.set(111,0);
+map1.set(112,2);
+map1.set(113,4);
+map1.set(114,5);
+map1.set(115,0);
+map1.set(116,0);
+map1.set(117,5);
+map1.set(118,1);
+map1.set(119,4);
+map1.set(120,2);
+map1.set(121,6);
+map1.set(122,6);
+map1.set(123,6);
+map1.set(124,4);
+map1.set(125,2);
+map1.set(126,2);
+map1.set(127,0);
+map1.set(128,2);
+map1.set(129,2);
+map1.set(130,2);
+map1.set(131,6);
+map1.set(132,0);
+map1.set(133,4);
+map1.set(134,1);
+map1.set(135,4);
+map1.set(136,5);
+map1.set(137,3);
+map1.set(138,3);
+map1.set(139,6);
+map1.set(140,5);
+map1.set(141,5);
+map1.set(142,0);
+map1.set(143,2);
+map1.set(144,6);
+map1.set(145,2);
+map1.set(146,2);
+map1.set(147,2);
+map1.set(148,4);
+map1.set(149,5);
+map1.set(150,5);
+map1.set(151,4);
+map1.set(152,5);
+map1.set(153,5);
+map1.set(154,3);
+map1.set(155,4);
+map1.set(156,0);
+map1.set(157,0);
+map1.set(158,0);
+map1.set(159,0);
+map1.set(160,5);
+map1.set(161,6);
+map1.set(162,6);
+map1.set(163,5);
+map1.set(164,5);
+map1.set(165,3);
+map1.set(166,0);
+map1.set(167,0);
+map1.set(168,2);
+map1.set(169,2);
+map1.set(170,6);
+map1.set(171,6);
+map1.set(172,6);
+map1.set(173,6);
+map1.set(174,6);
+map1.set(175,6);
+map1.set(176,2);
+map1.set(177,5);
+map1.set(178,5);
+map1.set(179,4);
+map1.set(180,0);
+map1.set(181,6);
+map1.set(182,2);
+map1.set(183,6);
+map1.set(184,0);
+map1.set(185,5);
+map1.set(186,3);
+map1.set(187,2);
+map1.set(188,1);
+map1.set(189,6);
+map1.set(190,1);
+map1.set(191,0);
+map1.set(192,4);
+map1.set(193,6);
+map1.set(194,5);
+map1.set(195,5);
+map1.set(196,6);
+map1.set(197,5);
+map1.set(198,2);
+map1.set(199,2);
+map1.set(200,7);
+map1.set(201,7);
+map1.set(202,3);
+map1.set(203,4);
+map1.set(204,2);
+map1.set(205,2);
+map1.set(206,5);
+map1.set(207,2);
+map1.set(208,0);
+map1.set(209,1);
+map1.set(210,0);
+map1.set(211,0);
+map1.set(212,1);
+map1.set(213,6);
+map1.set(214,5);
+map1.set(215,1);
+map1.set(216,4);
+map1.set(217,1);
+map1.set(218,0);
+map1.set(219,4);
+map1.set(220,5);
+map1.set(221,4);
+map1.set(222,3);
+map1.set(223,6);
+map1.set(224,6);
+map1.set(225,4);
+map1.set(226,2);
+map1.set(227,0);
+map1.set(228,2);
+map1.set(229,5);
+map1.set(230,0);
+map1.set(231,2);
+map1.set(232,5);
+map1.set(233,5);
+map1.set(234,4);
+map1.set(235,1);
+map1.set(236,5);
+map1.set(237,1);
+map1.set(238,4);
+map1.set(239,2);
+map1.set(240,2);
+map1.set(241,4);
+map1.set(242,3);
+map1.set(243,6);
+map1.set(244,6);
+map1.set(245,5);
+map1.set(246,5);
+map1.set(247,2);
+map1.set(248,2);
+map1.set(249,0);
+map1.set(250,2);
+map1.set(251,2);
+map1.set(252,3);
+map1.set(253,0);
+map1.set(254,0);
+map1.set(255,0);
+map1.set(256,5);
+map1.set(257,6);
+map1.set(258,0);
+map1.set(259,4);
+map1.set(260,2);
+map1.set(261,4);
+map1.set(262,5);
+map1.set(263,0);
+map1.set(264,6);
+map1.set(265,4);
+map1.set(266,6);
+map1.set(267,6);
+map1.set(268,1);
+map1.set(269,4);
+map1.set(270,6);
+map1.set(271,5);
+map1.set(272,2);
+map1.set(273,5);
+map1.set(274,5);
+map1.set(275,6);
+map1.set(276,4);
+map1.set(277,4);
+map1.set(278,6);
+map1.set(279,0);
+map1.set(280,5);
+map1.set(281,6);
+map1.set(282,6);
+map1.set(283,6);
+map1.set(284,6);
+map1.set(285,6);
+map1.set(286,6);
+map1.set(287,5);
+map1.set(288,6);
+map1.set(289,6);
+map1.set(290,6);
+map1.set(291,6);
+map1.set(292,0);
+map1.set(293,0);
+map1.set(294,0);
+map1.set(295,2);
+map1.set(296,2);
+map1.set(297,5);
+map1.set(298,6);
+map1.set(299,6);
+map1.set(300,6);
+map1.set(301,1);
+map1.set(302,0);
+map1.set(303,0);
+map1.set(304,0);
+map1.set(305,3);
+map1.set(306,1);
+map1.set(307,0);
+map1.set(308,0);
+map1.set(309,0);
+map1.set(310,0);
+map1.set(311,4);
+map1.set(312,2);
+map1.set(313,2);
+map1.set(314,3);
+map1.set(315,6);
+map1.set(316,6);
+map1.set(317,6);
+map1.set(318,2);
+map1.set(319,2);
+map1.set(320,4);
+map1.set(321,3);
+map1.set(322,6);
+map1.set(323,6);
+map1.set(324,6);
+map1.set(325,6);
+map1.set(326,5);
+map1.set(327,2);
+map1.set(328,1);
+map1.set(329,6);
+map1.set(330,2);
+map1.set(331,3);
+map1.set(332,6);
+
+var map2 = new Map()
+
+map2.set("Abbotsford",3.243672949);
+map2.set("Aberfeldie",8.218626931);
+map2.set("Airport West",12.31292697);
+map2.set("Albanvale",18.40510209);
+map2.set("Albert Park",3.649246315);
+map2.set("Albion",13.09832488);
+map2.set("Alphington",7.003257576);
+map2.set("Altona",13.77895786);
+map2.set("Altona Meadows",17.65230916);
+map2.set("Altona North",10.23455196);
+map2.set("Ardeer",14.65010733);
+map2.set("Armadale",7.032081713);
+map2.set("Ascot Vale",5.770215193);
+map2.set("Ashburton",12.02094821);
+map2.set("Ashwood",13.86965456);
+map2.set("Aspendale",26.31472961);
+map2.set("Aspendale Gardens",27.11610452);
+map2.set("Attwood",16.93770775);
+map2.set("Avondale Heights",10.62060228);
+map2.set("Bacchus Marsh",49.08699249);
+map2.set("Balaclava",7.092930057);
+map2.set("Balwyn",10.57110432);
+map2.set("Balwyn North",11.05589246);
+map2.set("Bayswater",26.41437526);
+map2.set("Bayswater North",28.29244681);
+map2.set("Beaconsfield",45.04719765);
+map2.set("Beaconsfield Upper",44.70776881);
+map2.set("Beaumaris",20.10918888);
+map2.set("Bellfield",9.54262523);
+map2.set("Bentleigh",14.12974809);
+map2.set("Bentleigh East",15.23995164);
+map2.set("Berwick",42.03696068);
+map2.set("Black Rock",18.54125605);
+map2.set("Blackburn",16.66211469);
+map2.set("Blackburn North",16.92212582);
+map2.set("Blackburn South",16.54079236);
+map2.set("Bonbeach",31.49807858);
+map2.set("Boronia",28.29063768);
+map2.set("Botanic Ridge",44.83965468);
+map2.set("Box Hill",14.5453791);
+map2.set("Braybrook",10.16627234);
+map2.set("Briar Hill",18.38001046);
+map2.set("Brighton",11.32386898);
+map2.set("Brighton East",12.65215554);
+map2.set("Broadmeadows",14.56919362);
+map2.set("Brookfield",38.29463771);
+map2.set("Brooklyn",10.49522465);
+map2.set("Brunswick",5.19488494);
+map2.set("Brunswick East",4.796650816);
+map2.set("Brunswick West",5.733791949);
+map2.set("Bulla",24.25512147);
+map2.set("Bulleen",12.35074529);
+map2.set("Bullengarook",54.18725825);
+map2.set("Bundoora",15.87035445);
+map2.set("Burnley",4.556579233);
+map2.set("Burnside",20.08460143);
+map2.set("Burnside Heights",20.10709246);
+map2.set("Burwood",13.81695213);
+map2.set("Burwood East",16.92488559);
+map2.set("Cairnlea",16.82631785);
+map2.set("Camberwell",10.39585166);
+map2.set("Campbellfield",14.94054821);
+map2.set("Canterbury",10.11741863);
+map2.set("Carlton",1.873998194);
+map2.set("Carlton North",3.158804306);
+map2.set("Carnegie",12.23473069);
+map2.set("Caroline Springs",21.70386163);
+map2.set("Carrum",32.77437211);
+map2.set("Carrum Downs",37.67917473);
+map2.set("Caulfield",10.03440454);
+map2.set("Caulfield East",10.88387113);
+map2.set("Caulfield North",8.097697491);
+map2.set("Caulfield South",10.58033876);
+map2.set("Chadstone",14.35643107);
+map2.set("Chelsea",29.60152632);
+map2.set("Chelsea Heights",30.11916133);
+map2.set("Cheltenham",19.27861506);
+map2.set("Chirnside Park",31.99130416);
+map2.set("Clarinda",18.71866693);
+map2.set("Clayton",18.49898318);
+map2.set("Clayton South",19.96640877);
+map2.set("Clifton Hill",3.831259308);
+map2.set("Clyde North",46.08002273);
+map2.set("Coburg",7.545997627);
+map2.set("Coburg North",9.496222989);
+map2.set("Coldstream",38.38199013);
+map2.set("Collingwood",2.643833165);
+map2.set("Coolaroo",17.02521068);
+map2.set("Craigieburn",25.34981137);
+map2.set("Cranbourne",42.58977833);
+map2.set("Cranbourne North",42.28221737);
+map2.set("Cranbourne West",41.49575804);
+map2.set("Cremorne",3.168127598);
+map2.set("Croydon",28.27461362);
+map2.set("Croydon Hills",26.96389058);
+map2.set("Croydon North",28.79534598);
+map2.set("Croydon South",27.5997884);
+map2.set("Dallas",16.02914279);
+map2.set("Dandenong",29.2999049);
+map2.set("Dandenong North",27.01790514);
+map2.set("Deepdene",9.114027881);
+map2.set("Deer Park",17.80862411);
+map2.set("Delahey",19.78879711);
+map2.set("Derrimut",17.89503816);
+map2.set("Diamond Creek",22.87210266);
+map2.set("Diggers Rest",30.46958826);
+map2.set("Dingley Village",23.79197547);
+map2.set("Docklands",1.883660527);
+map2.set("Doncaster",14.52289757);
+map2.set("Doncaster East",17.71145464);
+map2.set("Donvale",19.78863958);
+map2.set("Doreen",27.5736868);
+map2.set("Doveton",31.29610836);
+map2.set("Eaglemont",10.19738439);
+map2.set("East Melbourne",2.049569736);
+map2.set("Edithvale",28.48237802);
+map2.set("Elsternwick",9.143672054);
+map2.set("Eltham",20.17148209);
+map2.set("Eltham North",20.12953452);
+map2.set("Elwood",7.843095997);
+map2.set("Emerald",44.15233033);
+map2.set("Endeavour Hills",32.11984819);
+map2.set("Epping",20.25413717);
+map2.set("Essendon",8.433258712);
+map2.set("Essendon North",9.781372823);
+map2.set("Essendon West",9.443737551);
+map2.set("Eumemmerring",32.3431086);
+map2.set("Eynesbury",36.24558291);
+map2.set("Fairfield",6.495179137);
+map2.set("Fawkner",11.87196823);
+map2.set("Ferntree Gully",28.66312677);
+map2.set("Ferny Creek",32.96363059);
+map2.set("Fitzroy",2.192760156);
+map2.set("Fitzroy North",3.681332532);
+map2.set("Flemington",4.301360128);
+map2.set("Footscray",6.403726459);
+map2.set("Forest Hill",18.62752355);
+map2.set("Frankston",40.73108308);
+map2.set("Frankston North",38.33595928);
+map2.set("Frankston South",41.95452505);
+map2.set("Gardenvale",10.43101266);
+map2.set("Gisborne",47.90027358);
+map2.set("Gisborne South",42.6234947);
+map2.set("Gladstone Park",14.97811387);
+map2.set("Glen Huntly",11.16283865);
+map2.set("Glen Iris",10.2811184);
+map2.set("Glen Waverley",19.48912);
+map2.set("Glenroy",12.63711916);
+map2.set("Gowanbrae",13.25968636);
+map2.set("Greensborough",17.4063889);
+map2.set("Greenvale",20.49990353);
+map2.set("Hadfield",11.5584667);
+map2.set("Hallam",34.15202687);
+map2.set("Hampton",14.62108198);
+map2.set("Hampton East",15.33571011);
+map2.set("Hampton Park",36.13234284);
+map2.set("Hawthorn",6.163552578);
+map2.set("Hawthorn East",8.071282088);
+map2.set("Healesville",52.69819505);
+map2.set("Heatherton",18.79223355);
+map2.set("Heathmont",24.74351528);
+map2.set("Heidelberg",11.5071552);
+map2.set("Heidelberg Heights",11.18808622);
+map2.set("Heidelberg West",10.62285218);
+map2.set("Highett",16.61592457);
+map2.set("Hillside",23.2940227);
+map2.set("Hoppers Crossing",24.61363075);
+map2.set("Hughesdale",14.21885619);
+map2.set("Huntingdale",16.53656854);
+map2.set("Hurstbridge",28.43745238);
+map2.set("Ivanhoe",8.755560876);
+map2.set("Ivanhoe East",9.465965305);
+map2.set("Jacana",14.61540358);
+map2.set("Kalkallo",31.38137766);
+map2.set("Kealba",14.88213578);
+map2.set("Keilor",15.86824536);
+map2.set("Keilor Downs",17.18310744);
+map2.set("Keilor East",11.56408633);
+map2.set("Keilor Lodge",19.19954185);
+map2.set("Keilor Park",13.58834427);
+map2.set("Kensington",3.721881886);
+map2.set("Kew",6.912063481);
+map2.set("Kew East",8.232552163);
+map2.set("Keysborough",26.78243274);
+map2.set("Kilsyth",31.17011654);
+map2.set("Kings Park",18.79045181);
+map2.set("Kingsbury",12.57204152);
+map2.set("Kingsville",7.217045937);
+map2.set("Knoxfield",26.43541165);
+map2.set("Kooyong",7.213409544);
+map2.set("Kurunjang",36.383883);
+map2.set("Lalor",16.78453474);
+map2.set("Langwarrin",43.12036887);
+map2.set("Laverton",17.49709317);
+map2.set("Lilydale",35.4874479);
+map2.set("Lower Plenty",16.6424696);
+map2.set("Lynbrook",37.27248863);
+map2.set("Lysterfield",29.71317163);
+map2.set("Maidstone",8.275430598);
+map2.set("Malvern",8.222709163);
+map2.set("Malvern East",11.2509766);
+map2.set("Maribyrnong",7.643449805);
+map2.set("McKinnon",12.753821);
+map2.set("Meadow Heights",18.39174052);
+map2.set("Melbourne",0.632647505);
+map2.set("Melton",36.72212404);
+map2.set("Melton South",36.22200689);
+map2.set("Melton West",38.84913814);
+map2.set("Mentone",21.01110083);
+map2.set("Mernda",26.0037744);
+map2.set("Mickleham",30.39640057);
+map2.set("Middle Park",4.253423412);
+map2.set("Mill Park",18.47446611);
+map2.set("Mitcham",20.78009171);
+map2.set("Monbulk",40.25735816);
+map2.set("Mont Albert",12.90376042);
+map2.set("Montmorency",17.53636579);
+map2.set("Montrose",34.40732879);
+map2.set("Moonee Ponds",6.405461549);
+map2.set("Moorabbin",16.12314515);
+map2.set("Mooroolbark",31.50097046);
+map2.set("Mordialloc",23.81696658);
+map2.set("Mount Evelyn",36.84578055);
+map2.set("Mount Waverley",16.24994492);
+map2.set("Mulgrave",22.86526541);
+map2.set("Murrumbeena",13.32427586);
+map2.set("Narre Warren",37.99578688);
+map2.set("New Gisborne",50.4547612);
+map2.set("Newport",8.114788479);
+map2.set("Niddrie",10.50431341);
+map2.set("Noble Park",26.03869507);
+map2.set("North Melbourne",2.052240542);
+map2.set("North Warrandyte",24.41461682);
+map2.set("Northcote",5.640838615);
+map2.set("Notting Hill",19.27382433);
+map2.set("Nunawading",18.84480938);
+map2.set("Oak Park",11.32924438);
+map2.set("Oakleigh",15.45517788);
+map2.set("Oakleigh East",16.80212004);
+map2.set("Oakleigh South",16.83708881);
+map2.set("Officer",49.82329203);
+map2.set("Ormond",12.35078835);
+map2.set("Pakenham",53.17870005);
+map2.set("Parkdale",22.64603746);
+map2.set("Parkville",2.915197971);
+map2.set("Pascoe Vale",9.984298279);
+map2.set("Patterson Lakes",33.27948753);
+map2.set("Plenty",20.59977184);
+map2.set("Plumpton",23.5465119);
+map2.set("Point Cook",21.74837961);
+map2.set("Port Melbourne",3.549383235);
+map2.set("Prahran",5.577185503);
+map2.set("Preston",8.942732314);
+map2.set("Princes Hill",3.386161275);
+map2.set("Research",22.77704713);
+map2.set("Reservoir",11.80277654);
+map2.set("Richmond",3.643265829);
+map2.set("Riddells Creek",46.1339966);
+map2.set("Ringwood",23.96899226);
+map2.set("Ringwood East",25.47515864);
+map2.set("Ringwood North",23.39397152);
+map2.set("Ripponlea",7.899908236);
+map2.set("Rockbank",27.52819627);
+map2.set("Rosanna",12.46759421);
+map2.set("Rowville",28.27301564);
+map2.set("Roxburgh Park",20.72525334);
+map2.set("Sandhurst",36.67381369);
+map2.set("Sandringham",16.2848261);
+map2.set("Scoresby",24.77992323);
+map2.set("Seabrook",19.60218368);
+map2.set("Seaford",36.01716842);
+map2.set("Seaholme",11.82467495);
+map2.set("Seddon",6.297660794);
+map2.set("Silvan",42.97314643);
+map2.set("Skye",38.27260686);
+map2.set("South Kingsville",8.311587031);
+map2.set("South Melbourne",2.636279543);
+map2.set("South Morang",22.31510779);
+map2.set("South Yarra",4.056501278);
+map2.set("Southbank",1.634255104);
+map2.set("Spotswood",7.469405529);
+map2.set("Springvale",22.46793542);
+map2.set("Springvale South",24.51285738);
+map2.set("St Albans",15.90424071);
+map2.set("St Helena",20.23571773);
+map2.set("St Kilda",6.009190396);
+map2.set("Strathmore",9.729897928);
+map2.set("Strathmore Heights",12.46478673);
+map2.set("Sunbury",33.87582878);
+map2.set("Sunshine",11.40300695);
+map2.set("Sunshine North",12.1147079);
+map2.set("Sunshine West",13.72488827);
+map2.set("Surrey Hills",12.04965458);
+map2.set("Sydenham",21.27221925);
+map2.set("Tarneit",25.71338566);
+map2.set("Taylors Hill",21.42527707);
+map2.set("Taylors Lakes",19.7726807);
+map2.set("Templestowe",17.39697616);
+map2.set("Templestowe Lower",14.18363352);
+map2.set("The Basin",30.94322119);
+map2.set("Thomastown",15.49230775);
+map2.set("Thornbury",7.186089711);
+map2.set("Toorak",5.685942844);
+map2.set("Travancore",4.217322654);
+map2.set("Truganina",21.4455741);
+map2.set("Tullamarine",14.67223305);
+map2.set("Upwey",33.92710532);
+map2.set("Vermont",20.92582683);
+map2.set("Vermont South",20.08610739);
+map2.set("Viewbank",14.06480671);
+map2.set("Wallan",44.90626386);
+map2.set("Wandin North",40.03171366);
+map2.set("Wantirna",24.03349447);
+map2.set("Wantirna South",24.71294198);
+map2.set("Warrandyte",22.87330847);
+map2.set("Warranwood",25.44245845);
+map2.set("Waterways",26.77191024);
+map2.set("Watsonia",15.41418691);
+map2.set("Watsonia North",16.74647393);
+map2.set("Wattle Glen",25.16648341);
+map2.set("Werribee",28.32934575);
+map2.set("Werribee South",25.50243661);
+map2.set("West Footscray",8.191118525);
+map2.set("West Melbourne",1.3814972);
+map2.set("Westmeadows",16.37877623);
+map2.set("Wheelers Hill",22.11032838);
+map2.set("Whittlesea",36.3649672);
+map2.set("Wildwood",26.9434127);
+map2.set("Williams Landing",20.04942915);
+map2.set("Williamstown",8.127981365);
+map2.set("Williamstown North",8.65000108);
+map2.set("Windsor",5.610735761);
+map2.set("Wollert",22.7669854);
+map2.set("Wonga Park",29.11662488);
+map2.set("Wyndham Vale",31.2155321);
+map2.set("Yallambie",15.09736245);
+map2.set("Yarra Glen",40.25779704);
+map2.set("Yarraville",6.907549768);
+
+        var map;
+        var service;
+        var infowindow;
+
+
+        
+
+        function initMap() {
+            var melbourne = new google.maps.LatLng(-37.8136, 144.9631);
+
+            infowindow = new google.maps.InfoWindow();
+
+            map = new google.maps.Map(
+                document.getElementById('map'), {center: melbourne, zoom: 15});
+
+        }
+    
+        function createMarker(place, suburb, price) {
+            if (!place.geometry || !place.geometry.location) return;
+
+            let markerText = suburb;
+            const marker = new google.maps.Marker({
+                map,
+                position: place.geometry.location,
+                icon: {
+                    url: 'static/images/icons8-home-120.png', // URL to the marker image
+                    labelOrigin: new google.maps.Point(60, 120) // Position the label below the marker
+                },
+                label: {
+                    text: markerText, // The text of the label
+                    color: '#000000', // The color of the label text
+                    fontSize: '25px', // The font size of the label text
+                    fontWeight: 'bold' // The font weight of the label text
+                }
+            });
+
+            const marker2 = new google.maps.Marker({
+                map,
+                position: place.geometry.location,
+                icon: {
+                  url: 'static/images/icons8-home-120.png', // URL to the marker image
+                  labelOrigin: new google.maps.Point(60, 145) // Position the label below the marker
+                },
+                label: {
+                    text: price, // The text of the label
+                    color: '#000000', // The color of the label text
+                    fontSize: '25px', // The font size of the label text
+                    fontWeight: 'bold' // The font weight of the label text
+                }
+            });
+
+
+            google.maps.event.addListener(marker, "click", () => {
+                infowindow.setContent(place.name || "");
+                infowindow.open(map);
+            });
+
+            google.maps.event.addListener(marker2, "click", () => {
+                infowindow.setContent(place.name || "");
+                infowindow.open(map);
+            });
+        }
+
+        
+        function suburbSelected(value, suburb){
+            let regionValue = map1.get(parseInt(value));            
+            let region = document.getElementById('region');
+            region.value = regionValue;
+
+            let distance = Math.round(map2.get(suburb) * 10) / 10;
+            
+            document.getElementById('distanceLbl').innerHTML = "Distance from CBD: " + distance + " km"
+            document.getElementById("distance").value = distance;
+        }       
+        
+
+        
+
+        
+    
     </script>
 </body>
 </html>
