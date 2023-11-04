@@ -1,5 +1,8 @@
 # Melbourne House Pricing Prediction with Machine Learning Model
 
+![Melbourne-2](https://github.com/afadilla13/Final-Project-Melb-House-Price-Prediction/assets/128363337/6533aeb6-0fde-4243-9d2a-c0c8b638e837)
+
+
 ## Table of Contents
 
 - [Introduction](#introduction)
