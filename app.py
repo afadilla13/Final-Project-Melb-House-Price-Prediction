@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import pickle
 import pandas as pd
+import numpy as np
 
 # Initialize a new Flask application.
 app = Flask(__name__)
@@ -23,17 +24,20 @@ def predict():
     # Prepare the data for prediction by creating a pandas DataFrame.
     # This DataFrame mirrors the structure expected by the trained model.
     prediction_data = pd.DataFrame({
-        'Suburb': [data['suburb']],
-        'Rooms': [data['rooms']],
         'Type': [data['type']],
-        'Distance': [data['distance']],
+        'Rooms': [data['rooms']],
         'Bathroom': [data['bathroom']],
+        'Distance': [data['distance']],
         'Car': [data['garage']],
+        'Suburb': [data['suburb']],
         'Region': [data['region']]
     })
 
     # Use the pre-loaded model to make a prediction based on the input data.
-    prediction = model.predict(prediction_data)[0]
+    log_price_predictions = model.predict(prediction_data)[0]
+
+    # Convert the log price predictions back to actual prices
+    prediction = np.exp(log_price_predictions)
 
     # Format the prediction as a currency string.
     formatted_prediction = "${:,.2f}".format(prediction)
