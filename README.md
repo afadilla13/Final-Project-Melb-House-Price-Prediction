@@ -93,6 +93,7 @@ All data files can be found in the `Raw_Data` directory of this repository. A cs
 ## Results
 
 After evaluating multiple models, **the Random Forest Regression model using Randomized Search CV showed the best performance with an MSE of 131079776297.77234, RMSE of 362049.41140370927, MAE of 204277.86363556335 and an R-squared value of 0.7022104951937344**. This model was then used to predict property prices on unseen data.
+
 ![Best_Model](https://github.com/afadilla13/Final-Project-Melb-House-Price-Prediction/assets/128363337/e51d0db8-2a20-4dc6-891e-e54ef8648beb)
 
 Our recommendation engine was able to:
@@ -100,7 +101,10 @@ Our recommendation engine was able to:
 - Suggest suitable properties for families based on their inputs.
 - Identify potential undervalued properties for investors, which could yield higher returns upon investment.
 
-## Webpage Display
+## Webpage Display with interactive Google maps background
+
+![Google_maps](https://github.com/afadilla13/Final-Project-Melb-House-Price-Prediction/assets/128363337/9493035e-8684-4ba2-aac6-aed526ee0271)
+
 Webpage display before features selection:
 ![Webpage 1](https://github.com/afadilla13/Final-Project-Melb-House-Price-Prediction/assets/128363337/776f88f7-cfe8-4ff4-8c6b-a0dfc9b337f8)
 
