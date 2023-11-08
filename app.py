@@ -33,8 +33,11 @@ def predict():
         'Region': [data['region']]
     })
 
+    # Convert the DataFrame to a NumPy array to remove feature names
+    prediction_data_np = prediction_data.to_numpy()
+
     # Use the pre-loaded model to make a prediction based on the input data.
-    log_price_predictions = model.predict(prediction_data)[0]
+    log_price_predictions = model.predict(prediction_data_np)[0]
 
     # Convert the log price predictions back to actual prices
     prediction = np.exp(log_price_predictions)
